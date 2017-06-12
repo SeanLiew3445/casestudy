@@ -36,13 +36,7 @@ def get_read(bridge):
 def add_port():
 	bridge = request.json['bridge']
         interface = request.json['interface']
-
-	#check if bridge already exists
 	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
-		abort(404)
-
-	#check if interface already exists on pc
-	if len(str(subprocess_sean.int_pc(interface))) == 0:
 		abort(404)
 
 	if not request.json:
@@ -59,8 +53,6 @@ def add_port():
 @cs.route('/delete/<bridge>', methods=['DELETE'])
 @auth.login_required
 def del_port(bridge):
-	
-	#check if bridge exists
 	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
 		abort(404)
 
@@ -68,24 +60,16 @@ def del_port(bridge):
 		abort(400)
 
 	port = request.json['port']
-
-	#check if port exists on bridge
-	if len(str(subprocess_sean.int_bridge(port))) == 0:
-		abort(404)		
-
 	subprocess_sean.del_ports(bridge, port)
 	return jsonify({'result': True})
 
 @cs.route('/update/<bridge>/<port>', methods=['PUT'])
 @auth.login_required
 def update_port(bridge, port):
-
-	#check if bridge exist
 	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
 		abort(404)
 	
-	#check if port exist on bridge
-	if len(str(subprocess_sean.int_bridge(port))) == 0:
+	if len(str(subprocess_sean.check(port))) == 0:
 		abort(404)
 
 	if not request.json or not 'action' in request.json:
