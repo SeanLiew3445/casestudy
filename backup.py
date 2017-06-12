@@ -26,7 +26,8 @@ def not_found(error):
 @cs.route('/read/<bridge>', methods=['GET'])
 @auth.login_required
 def get_read(bridge):
-	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
+	#check if bridge exists on pc
+	if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
 		abort(404)
 
 	return str(subprocess_sean.get_ports(bridge))	
@@ -35,33 +36,33 @@ def get_read(bridge):
 @auth.login_required
 def add_port():
 	bridge = request.json['bridge']
-        interface = request.json['interface']
+        port = request.json['port']
 
 	#check if bridge already exists
-	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
+	if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
 		abort(404)
 
 	#check if interface already exists on pc
-	if len(str(subprocess_sean.int_pc(interface))) == 0:
-		abort(404)
+	#if len(str(subprocess_sean.int_pc(interface))) == 0:
+	#	abort(404)
 
 	if not request.json:
 		abort(400)
 	if not 'bridge' in request.json and type(request.json['bridge']) != unicode:
 		abort(400)
-	if not 'interface' in request.json and type(request.json['interface']) != unicode:
+	if not 'port' in request.json and type(request.json['port']) != unicode:
 		abort(400)
 
-	subprocess_sean.add_ports(bridge, interface)
+	subprocess_sean.add_ports(bridge, port)
 	return jsonify({'Bridge': bridge,
-			'Interface': interface}), 201
+			'Port': port}), 201
 
 @cs.route('/delete/<bridge>', methods=['DELETE'])
 @auth.login_required
 def del_port(bridge):
 	
 	#check if bridge exists
-	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
+	if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
 		abort(404)
 
 	if not request.json or not 'port' in request.json:
@@ -70,7 +71,7 @@ def del_port(bridge):
 	port = request.json['port']
 
 	#check if port exists on bridge
-	if len(str(subprocess_sean.int_bridge(port))) == 0:
+	if len(str(subprocess_sean.port_bridge(port))) == 0:
 		abort(404)		
 
 	subprocess_sean.del_ports(bridge, port)
@@ -81,11 +82,11 @@ def del_port(bridge):
 def update_port(bridge, port):
 
 	#check if bridge exist
-	if len(str(subprocess_sean.get_ovsctlshow(bridge))) == 0:
+	if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
 		abort(404)
 	
 	#check if port exist on bridge
-	if len(str(subprocess_sean.int_bridge(port))) == 0:
+	if len(str(subprocess_sean.port_bridge(port))) == 0:
 		abort(404)
 
 	if not request.json or not 'action' in request.json:

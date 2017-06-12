@@ -1,15 +1,15 @@
 import subprocess, sys
 from flask import Flask, jsonify
 
-def get_ovsctlshow(bridge):
+def bridge_pc(bridge):
 	show = subprocess.Popen(('sudo ovs-vsctl show | grep ' + bridge), shell=True, stdout=subprocess.PIPE).communicate()[0]
 	return show
 
-def int_pc(port):
-	show = subprocess.Popen(('sudo ifconfig | grep ' + port),shell=True, stdout=subprocess.PIPE).communicate()[0]
+def int_pc(interface):
+	show = subprocess.Popen(('sudo ifconfig | grep ' + interface),shell=True, stdout=subprocess.PIPE).communicate()[0]
         return show
 
-def int_bridge(port):
+def port_bridge(port):
 	show = subprocess.Popen(('sudo ovs-vsctl show | grep ' + port), shell=True, stdout=subprocess.PIPE).communicate()[0]
         return show
 
@@ -17,8 +17,8 @@ def get_ports(bridge):
 	read = subprocess.call(['sudo', 'ovs-ofctl', 'dump-ports-desc', bridge])
 	return read
 
-def add_ports(bridge, interface):
-	add = subprocess.call(['sudo', 'ovs-vsctl', 'add-port', bridge, interface])
+def add_ports(bridge, port):
+	add = subprocess.call(['sudo', 'ovs-vsctl', 'add-port', bridge, port])
 
 def del_ports(bridge, port):
 	delete = subprocess.call(['sudo', 'ovs-vsctl', '--if-exists', 'del-port', bridge, port])
