@@ -124,7 +124,7 @@ def add_bridge(bridge):
 
         #check if bridge already exists
         if len(str(subprocess_sean.bridge_pc(bridge))) != 0:
-                abort(400)
+                abort(404)
 
         subprocess_sean.add_bridge(bridge)
         return jsonify({'Bridge': bridge}), 201
@@ -159,14 +159,11 @@ def update_bridge(bridge):
 
 #----------------------------------Port mirror---------------------------------
 
-@cs.route('/read/mirror/<bridge>', methods=['GET'])
+@cs.route('/read/mirror/<mirror>', methods=['GET'])
 @auth.login_required
-def get_mirror(bridge):
-        #check if bridge exists on pc
-        if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
-                abort(404)
-
-        return subprocess_sean.get_bridge(bridge)
+def get_mirror(mirror):
+      
+        return subprocess_sean.get_mirror(mirror)
 
 @cs.route('/add/mirror/<bridge>', methods=['POST'])
 @auth.login_required
@@ -175,21 +172,43 @@ def add_mirror(bridge):
         #check if bridge already exists
         if len(str(subprocess_sean.bridge_pc(bridge))) != 0:
                 abort(400)
+	
+        if not request.json or not 'options' in request.json:
+                abort(400)
 
-        subprocess_sean.add_bridge(bridge)
+        if not request.json or not 'options' in request.json:
+                abort(400)
+      
+	if not request.json or not 'options' in request.json:
+                abort(400)
+        if not request.json or not 'options' in request.json:
+                abort(400)
+        if not request.json or not 'options' in request.json:
+                abort(400)
+        if not request.json or not 'options' in request.json:
+                abort(400)
+        if not request.json or not 'options' in request.json:
+                abort(400)
+        if not request.json or not 'options' in request.json:
+                abort(400)
+
+        options = request.json['options']
+	
+
+        subprocess_sean.add_mirror(bridge)
         return jsonify({'Bridge': bridge}), 201
 
-@cs.route('/delete/mirror/<bridge>', methods=['DELETE'])
+
+@cs.route('/delete/mirror/<bridge>/<mirror>', methods=['DELETE'])
 @auth.login_required
-def del_mirror(mirror):
+def del_mirror(bridge, mirror):
 
         #check if bridge exists
         if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
                 abort(404)
 
-        subprocess_sean.del_bridge(bridge)
+        subprocess_sean.del_bridge(bridge, mirror)
         return jsonify({'Result': True}), 201
-
 
 
 
