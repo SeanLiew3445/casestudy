@@ -1,19 +1,25 @@
 import subprocess, sys
 from flask import Flask, jsonify
 
+#------------------------------------Error Handling---------------------------
+
 def bridge_pc(bridge):
-	check = subprocess.Popen(('sudo ovs-vsctl list-br | grep ' + bridge), shell=True, stdout=subprocess.PIPE).communicate()[0]
+	check = subprocess.Popen(('sudo ovs-vsctl list-br | grep -w ' + bridge), shell=True, stdout=subprocess.PIPE).communicate()[0]
 	return check
 
-#---------------------------PORT-----------------------------------------------
-
 def int_pc(interface):
-	check = subprocess.Popen(('sudo ifconfig | grep ' + interface),shell=True, stdout=subprocess.PIPE).communicate()[0]
+        check = subprocess.Popen(('sudo ifconfig | grep -w ' + interface),shell=True, stdout=subprocess.PIPE).communicate()[0]
         return check
 
 def port_bridge(bridge, port):
-	check = subprocess.Popen(('sudo ovs-vsctl list-ports ' + bridge + ' | grep ' + port), shell=True, stdout=subprocess.PIPE).communicate()[0]
+        check = subprocess.Popen(('sudo ovs-vsctl list-ports ' + bridge + ' | grep ' + port), shell=True, stdout=subprocess.PIPE).communicate()[0]
         return check
+
+def check_mirror(mirror):
+        check = subprocess.Popen(('sudo ovs-vsctl list mirror | grep ' + mirror), shell=True, stdout=subprocess.PIPE).communicate()[0]
+        return check
+
+#---------------------------PORT-----------------------------------------------
 
 def get_ports(bridge):
 	read = subprocess.check_output(['sudo', 'ovs-ofctl', 'dump-ports-desc', bridge])
@@ -51,8 +57,8 @@ def get_mirror(mirror):
         read = subprocess.check_output(['sudo', 'ovs-vsctl', 'list', 'mirror', mirror])
         return read
 
-def add_mirror(port1, port2, port3, port4, name, dest, src, output):
-        subprocess.call(['sudo', 'ovs-vsctl', '--', 'set', 'Bridge', bridge, 'mirrors=@m', '--', port1, 'get', 'Port', port2, '--', port3, 'get', 'Port', port4, '--', '--id=@m', 'create', 'Mirror', name, dest, src, output])
+def add_mirror(bridge, port1, port2, port3, port4, name, dest, source, output):
+        subprocess.call(['sudo', 'ovs-vsctl', '--', 'set', 'Bridge', bridge, 'mirrors=@m', '--', port1, 'get', 'Port', port2, '--', port3, 'get', 'Port', port4, '--', '--id=@m', 'create', 'Mirror', name, dest, source, output])
 
 def del_mirror(bridge, mirror):
         subprocess.call(['sudo', 'ovs-vsctl', '--', '--id=@m', 'get', 'mirror', mirror, '--', 'remove', 'bridge', bridge, 'mirrors', '@m'])
