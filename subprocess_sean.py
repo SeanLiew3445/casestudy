@@ -63,3 +63,19 @@ def add_mirror(bridge, port1, port2, port3, port4, name, dest, source, output):
 def del_mirror(bridge, mirror):
         subprocess.call(['sudo', 'ovs-vsctl', '--', '--id=@m', 'get', 'mirror', mirror, '--', 'remove', 'bridge', bridge, 'mirrors', '@m'])
 
+
+
+#---------------------------Netflow--------------------------
+def get_netflow(bridge):
+        read = subprocess.check_output(['sudo', 'ovs-vsctl', 'list', 'netflow', bridge])
+        return read
+
+def add_netflow(bridge, target, timeout):
+        subprocess.call(['sudo', 'ovs-vsctl', '--', 'set', 'Bridge', bridge, 'netflow=@nf', '--', '--id=@nf', 'create', 'NetFlow', target, timeout])
+
+def update_netflow(bridge, options):
+        subprocess.call(['sudo', 'ovs-vsctl', 'set', 'NetFlow', bridge, options])
+
+def del_netflow(bridge):
+        subprocess.call(['sudo', 'ovs-vsctl', 'clear', 'Bridge', bridge, 'netflow'])
+
