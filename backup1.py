@@ -36,7 +36,7 @@ def get_port(bridge):
 	if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
 		abort(404)
 
-	return str(subprocess_sean.get_ports(bridge))	
+	return subprocess_sean.get_ports(bridge)	
 
 @cs.route('/add/port/<bridge>', methods=['POST'])
 @auth.login_required
@@ -75,16 +75,16 @@ def del_port(bridge):
 	port = request.json['port']
 
 	#check if port exists on bridge
-	if len(str(subprocess_sean.port_bridge(port))) == 0:
+	if len(str(subprocess_sean.port_bridge(bridge, port))) == 0:
 		abort(404)		
 
 	subprocess_sean.del_ports(bridge, port)
 	
 	#check if delete was successful
-	if len(str(subprocess_sean.port_bridge(port))) != 0:
+	if len(str(subprocess_sean.port_bridge(bridge, port))) != 0:
 		abort(404)	
 
-	return jsonify({'result': True})
+	return jsonify({'Result': True}), 201
 
 @cs.route('/update/port/<bridge>/<port>', methods=['PUT'])
 @auth.login_required
@@ -95,7 +95,7 @@ def update_port(bridge, port):
 		abort(404)
 	
 	#check if port exist on bridge
-	if len(str(subprocess_sean.port_bridge(port))) == 0:
+	if len(str(subprocess_sean.port_bridge(bridge, port))) == 0:
 		abort(404)
 
 	if not request.json or not 'action' in request.json:
@@ -103,7 +103,9 @@ def update_port(bridge, port):
 
 	action = request.json['action']
 	subprocess_sean.update_ports(bridge, port, action)
-	return str(subprocess_sean.get_ports(bridge))
+	return jsonify({'Bridge': bridge,
+			'Port': port,
+			'Action': action}), 201
 
 #-------------------------------Bridge-----------------------------------------
 
@@ -114,7 +116,7 @@ def get_bridge(bridge):
         if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
                 abort(404)
 
-        return str(subprocess_sean.get_bridge(bridge))
+        return subprocess_sean.get_bridge(bridge)
 
 @cs.route('/add/bridge/<bridge>', methods=['POST'])
 @auth.login_required
@@ -136,7 +138,7 @@ def del_bridge(bridge):
                 abort(404)
 
         subprocess_sean.del_bridge(bridge)
-        return jsonify({'result': True})
+        return jsonify({'Result': True})
 
 @cs.route('/update/bridge/<bridge>', methods=['PUT'])
 @auth.login_required
@@ -149,7 +151,10 @@ def update_bridge(bridge):
                 abort(400)
 
         options = request.json['options']
-        return str(subprocess_sean.update_bridge(bridge,options))
+        subprocess_sean.update_bridge(bridge,options)
+
+	return jsonify({'Bridge': bridge,
+			'Options': options}), 201
 
 
 #----------------------------------Port mirror---------------------------------
