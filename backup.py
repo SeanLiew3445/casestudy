@@ -138,7 +138,7 @@ def del_bridge(bridge):
                 abort(404)
 
         subprocess_sean.del_bridge(bridge)
-        return jsonify({'Result': True})
+        return jsonify({'Result': True}), 201
 
 @cs.route('/update/bridge/<bridge>', methods=['PUT'])
 @auth.login_required
@@ -158,6 +158,39 @@ def update_bridge(bridge):
 
 
 #----------------------------------Port mirror---------------------------------
+
+@cs.route('/read/mirror/<bridge>', methods=['GET'])
+@auth.login_required
+def get_mirror(bridge):
+        #check if bridge exists on pc
+        if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
+                abort(404)
+
+        return subprocess_sean.get_bridge(bridge)
+
+@cs.route('/add/mirror/<bridge>', methods=['POST'])
+@auth.login_required
+def add_mirror(bridge):
+
+        #check if bridge already exists
+        if len(str(subprocess_sean.bridge_pc(bridge))) != 0:
+                abort(400)
+
+        subprocess_sean.add_bridge(bridge)
+        return jsonify({'Bridge': bridge}), 201
+
+@cs.route('/delete/mirror/<bridge>', methods=['DELETE'])
+@auth.login_required
+def del_mirror(mirror):
+
+        #check if bridge exists
+        if len(str(subprocess_sean.bridge_pc(bridge))) == 0:
+                abort(404)
+
+        subprocess_sean.del_bridge(bridge)
+        return jsonify({'Result': True}), 201
+
+
 
 
 if __name__ == '__main__':

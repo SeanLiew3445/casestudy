@@ -47,3 +47,13 @@ def update_bridge(bridge, options):
 
 #--------------------------------Port mirror-----------------------------------
 
+def get_mirror(mirror):
+        read = subprocess.check_output(['sudo', 'ovs-vsctl', 'list', 'mirror', mirror])
+        return read
+
+def add_mirror(port1, port2, port3, port4, name, dest, src, output):
+        subprocess.call(['sudo', 'ovs-vsctl', '--', 'set', 'Bridge', bridge, 'mirrors=@m', '--', port1, 'get', 'Port', port2, '--', port3, 'get', 'Port', port4, '--', '--id=@m', 'create', 'Mirror', name, dest, src, output])
+
+def del_mirror(bridge, mirror):
+        subprocess.call(['sudo', 'ovs-vsctl', '--', '--id=@m', 'get', 'mirror', mirror, '--', 'remove', 'bridge', bridge, 'mirrors', '@m'])
+
